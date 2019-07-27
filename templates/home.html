@@ -1,143 +1,115 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Little - Dinosaur</title>
+{%extends "base.html"%}
 
-  <link href="http://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-  <link href="http://cdn.bootcss.com/font-awesome/5.10.0-11/css/fontawesome.min.css" rel="stylesheet">
-
-  <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
-  <script src="https://cdn.bootcss.com/echarts/4.2.1-rc1/echarts.min.js"></script>
-  <script src="https://cdn.bootcss.com/popper.js/1.15.0/umd/popper.min.js"></script>
-  <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
-</head>
-
-<body>
-<nav class="navbar navbar-dark fixed-top flex-md-nowrap header">
-  <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">
-    <img src="./static/img/logo.jpg" width="35" height="35"
-      class="d-inline-block align-top rounded-circle">
-    <span class="ml-1">Little Dinosaur</span> 
+{% block sidebar_nav %}
+<li class="nav-item">
+  <a class="nav-link active" href="/">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+      viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-home">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+      <polyline points="9 22 9 12 15 12 15 22"></polyline>
+    </svg>
+    Home
   </a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="/">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+      viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-bar-chart-2">
+      <line x1="18" y1="20" x2="18" y2="10"></line>
+      <line x1="12" y1="20" x2="12" y2="4"></line>
+      <line x1="6" y1="20" x2="6" y2="14"></line>
+    </svg>
+    Reports
+  </a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="/predict">
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+    class="feather feather-users">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+    <circle cx="9" cy="7" r="4"></circle>
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+  </svg>
+  Predict
+  </a>
+</li>
+{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mt-2">
+  <ol class="breadcrumb px-0" style="background-color: #f0f4f5">
+    <li class="breadcrumb-item active" aria-current="page">Home</li>
+  </ol>
 </nav>
-<!-- header nav end -->
+<!-- breadcrumb -->
 
-<div class="container-fluid" style="background-color: #f0f4f5;">
-  <div class="row">
-    <nav class="col-md-2 px-0 d-none d-md-block sidebar">
-      <div class="sidebar-sticky">
-        <ul class="nav flex-column">
-          <li class="nav-item">
-            <a class="nav-link active" href="/">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                class="feather feather-home">
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                <polyline points="9 22 9 12 15 12 15 22"></polyline>
-              </svg>
-              Dashboard
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round"
-                class="feather feather-bar-chart-2">
-                <line x1="18" y1="20" x2="18" y2="10"></line>
-                <line x1="12" y1="20" x2="12" y2="4"></line>
-                <line x1="6" y1="20" x2="6" y2="14"></line>
-              </svg>
-              Reports
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/predict">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-              viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-              class="feather feather-users">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-            </svg>
-            Predict
-            </a>
-          </li>
-        </ul>
-      </div>
-    </nav>
-    <!-- sidebar nav end -->
-
-    <main role="main" class="col-10 px-5 ml-auto" style="padding-top:60px;">
-      <nav aria-label="breadcrumb" class="mt-2">
-        <ol class="breadcrumb px-0" style="background-color: #f0f4f5">
-          <li class="breadcrumb-item"><a href="#">Home</a></li>
-          <li class="breadcrumb-item active" aria-current="page">Station</li>
-        </ol>
-      </nav>
-
-      <div class="row border-bottom pt-3 pb-2 d-flex flex-wrap flex-md-nowrap align-items-center">
-        <h4 class="col-2">各大网站互联网岗位对比</h4>
-        <div class="btn-group col-2 offset-5 d-flex">
-          <button class="btn btn-sm btn-outline-secondary" style="font-size:13px">平均薪资</button>
-          <button class="btn btn-sm btn-outline-secondary" style="font-size:13px">岗位数量</button>
-        </div>
-      </div>
-      <!-- top10 chart header -->
-
-      <div id="top" class="mt-4" style="width:100%;height:400px;"></div>
-      <!-- top10 chart -->
-
-      <div class="pt-5 pb-2 row d-flex flex-wrap flex-md-nowrap align-items-center">
-        <h4 class="col-2">各互联网岗位情况</h4>
-        <!-- <div class="input-group input-group-sm col-4 offset-6">
-          <input type="text" class="form-control" placeholder="输入岗位">
-          <div class="input-group-append">
-            <button class="btn btn-outline-secondary" type="button" id="button-addon2">搜索</button>
-          </div>
-        </div> -->
-      </div>
-      <!-- 岗位 tabel header end -->
-
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>岗位名称</th>
-            <th>岗位总数量</th>
-            <th>平均薪资/年</th>
-            <th>岗位数量最多的城市</th>
-            <th>查看</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>0</td>
-            <td>python工程师</td>
-            <td>300</td>
-            <td>30万元</td>
-            <td>北京</td>
-            <td>
-              <button class="btn btn-primary btn-sm"> 查看 </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <!-- table end -->
-    </main>
-    <!-- main end  -->
+<div class="border-bottom pt-3 pb-2 d-flex flex-wrap flex-md-nowrap align-items-center">
+  <h4 class="col-3">各大网站互联网岗位对比</h4>
+  <div class="btn-group d-flex">
+    <button class="btn btn-sm btn-outline-secondary" style="font-size:13px">平均薪资</button>
+    <button class="btn btn-sm btn-outline-secondary" style="font-size:13px">岗位数量</button>
   </div>
-  <!-- row end  -->
 </div>
-<!-- container-fluid -->
+<!-- comp bar chart header -->
+
+<div id="comp" class="mt-4" style="width:100%;height:400px;"></div>
+<!-- comp bar chart -->
+
+<div class="pt-5 pb-2 row d-flex flex-wrap flex-md-nowrap align-items-center">
+  <h4 class="col-2">各互联网岗位情况</h4>
+</div>
+<!-- 岗位 tabel header end -->
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>岗位名称</th>
+      <th>平均薪资/月</th>
+      <th>岗位总数量</th>
+      <th>岗位数量最多的城市</th>
+      <th>详情</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for station in station_list %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td>{{ station.station_name }}</td>
+      <td>{{ station.mean_salary }}</td>
+      <td>{{ station.count }}</td>
+      <td>{{ station.max_count_city }}  {{ station.max_count }}/{{ station.count }}</td>
+      <td><a class="btn btn-primary btn-sm" href="/station_detail"> 详情 </a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<!-- table end -->
+{% endblock %}
+
+{% block styles %}
 <!-- 越后面加载，优先级越高 -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-<script src="{{ url_for('static', filename='js/home.js') }}"></script>
-</body>
-</html>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$.ajax({
+  type: 'GET',
+  url: '',
+  dataType: 'json',
+  success: function(data){
+  },
+  error: function(data){
+  }
+});
+</script>
+<script src="{{ url_for('static', filename='js/comp_bar.js') }}"></script>
+{% endblock %}
