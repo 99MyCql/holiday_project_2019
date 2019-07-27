@@ -1,0 +1,75 @@
+【cmd 进入 cnn_train.py 所在路径，输入 python cnn_train.py train，开始训练。
+   训练前把 tensorboard 文件夹删掉，防止覆盖出错。
+   训练次数挺多的，如果准确率挺高的，直接强制退出。】
+
+【cmd 进入 cnn_train.py 所在路径，输入 python cnn_train.py test，查看测试评分。】
+ metrics.classification_report：precision、recall、f1-score（精确度/召回率/F1值）。
+ metrics.confusion_matrix：混淆矩阵，对于两个不相关的职业类别的区分度，越低越好。
+
+【最终保存的模型在 checkpoints/textcnn/best_validation 目录下。】
+
+【predict.py】模拟预测
+
+=====================================================
+
+【cnews_loader.py】
+
+构建词汇表，用 Counter 函数取出所有元素出现次数最多的前若干个作为 vocab。
+用 dict 构造字典结构，将 vocab 和 分类 转化为 id 格式，并实现文字与 id 相互转换的方法。
+
+read_file() 读取 label (分类) 和 content (描述)。
+word_to_id：词汇 id， cat_to_id：分类 id。
+
+data_id 存储每行数据所含词汇的 id 序列。
+label_id 存储每行数据的分类 id。
+data_id、label_id 对所有行都进行如上存储。
+
+使用 keras 提供的 pad_sequences 来将文本填充为固定长度。
+x_pad = kr.preprocessing.sequence.pad_sequences(data_id, max_length)
+使用 keras 中的 keras.utils.to_categorical 将整型标签转为 one-hot 表示。
+y_pad = kr.utils.to_categorical(label_id, num_classes=len(cat_to_id))
+最终，在 train 函数中， x_pad 赋给 x_train， y_pad 赋给 y_train。
+
+【cnn_model.py】
+
+TCNNConfig：配置CNN参数
+TextCNN：文本分类，CNN模型
+
+1、词向量映射
+embedding_inputs = tf.nn.embedding_lookup(embedding, self.input_x)：
+self.input_x 相当于词向量索引，在词汇表 embedding 中找出 self.input_x 中的单词的向量表达方式。
+
+2、卷积和池化
+with tf.name_scope("cnn"):
+tf.layers.conv1d：一维卷积用于处理文本
+tf.reduce_max：池化取最大值
+
+3、全连接和激活
+with tf.name_scope("score"):
+tf.layers.dense：构建全连接层
+tf.contrib.layers.dropout：取部分神经元，减小过拟合
+tf.nn.relu：激活函数 relu
+
+4、分类和损失优化
+with tf.name_scope("optimize"):
+tf.nn.softmax_cross_entropy_with_logits：softmax 分类，交叉熵，损失函数
+tf.train.AdamOptimizer：优化器
+
+5、计算准确率
+with tf.name_scope("accuracy"):
+correct_pred = tf.equal(tf.argmax(self.input_y, 1), self.y_pred_cls)
+self.acc = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
+
+
+【run_cnn.py】
+
+config = TCNNConfig()
+categories, cat_to_id = read_category()  # 分类
+words, word_to_id = read_vocab(vocab_dir)  # 词汇
+config.vocab_size = len(words)
+model = TextCNN(config)
+
+train_dir = os.path.join(base_dir, 'cnews.train.txt')
+test_dir = os.path.join(base_dir, 'cnews.test.txt')
+val_dir = os.path.join(base_dir, 'cnews.val.txt')
+数据分为 训练集、测试集、验证集，比例为 70:21:9。

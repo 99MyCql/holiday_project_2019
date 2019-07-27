@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Little - Dinosaur</title>
+
+  <link href="http://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+  <link href="http://cdn.bootcss.com/font-awesome/5.10.0-11/css/fontawesome.min.css" rel="stylesheet">
+
+  <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdn.bootcss.com/echarts/4.2.1-rc1/echarts.min.js"></script>
+  <script src="https://cdn.bootcss.com/popper.js/1.15.0/umd/popper.min.js"></script>
+  <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=k28IL6xxiNxtiR4RzXrOPwgOuNIA0QSL"></script>
+  <!-- 引入百度地图扩展 -->
+  <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/extension/bmap.min.js"></script>
+</head>
+
+<body>
+<nav class="navbar navbar-dark fixed-top flex-md-nowrap header">
+  <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">
+    <img src="./static/img/logo.jpg" width="35" height="35"
+      class="d-inline-block align-top rounded-circle">
+    <span class="ml-1">Little Dinosaur</span> 
+  </a>
+</nav>
+<!-- header nav end -->
+
+<div class="container-fluid" style="background-color: #f0f4f5;">
+  <div class="row">
+    <nav class="col-md-2 px-0 d-none d-md-block sidebar">
+      <div class="sidebar-sticky">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="feather feather-home">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+              </svg>
+              Dashboard <span class="sr-only">(current)</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="#">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round"
+                class="feather feather-bar-chart-2">
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+              </svg>
+              Reports
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="feather feather-users">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            Customers
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <!-- sidebar nav end -->
+
+    <main role="main" class="col-10 px-5 ml-auto" style="padding-top:60px;">
+      <nav aria-label="breadcrumb" class="mt-2">
+        <ol class="breadcrumb px-0" style="background-color: #f0f4f5">
+          <li class="breadcrumb-item"><a href="#">Home</a></li>
+          <li class="breadcrumb-item active" aria-current="page">city</li>
+        </ol>
+      </nav>
+
+      <div class="row border-bottom pt-3 pb-2 d-flex flex-wrap flex-md-nowrap align-items-center">
+        <h4 class="">python岗位各城市分布情况</h4>
+      </div>
+      <!-- city map header end -->
+
+      <div id="city" class="mt-4" style="width:100%;height:600px;"></div>
+      <!-- city map end -->
+
+      <div class="row border-bottom pt-3 pb-2 d-flex flex-wrap flex-md-nowrap align-items-center">
+        <h4 class="">各城市房价水平(地图)</h4>
+      </div>
+
+      <div class="row border-bottom pt-3 pb-2 d-flex flex-wrap flex-md-nowrap align-items-center">
+        <h4 class="">学历对该岗位的影响(折线图)</h4>
+      </div>
+
+      <div class="row border-bottom pt-3 pb-2 d-flex flex-wrap flex-md-nowrap align-items-center">
+        <h4 class="">经验对该岗位的影响(折线图)</h4>
+      </div>
+
+      <div class="row border-bottom pt-3 pb-2 d-flex flex-wrap flex-md-nowrap align-items-center">
+        <h4 class="">该岗位需要的能力和技术</h4>
+      </div>
+    </main>
+    <!-- main end  -->
+  </div>
+  <!-- row end  -->
+</div>
+<!-- container-fluid end -->
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<script src="{{ url_for('static', filename='js/station.js') }}"></script>
+</body>
+</html>
