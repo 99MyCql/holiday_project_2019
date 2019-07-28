@@ -32,10 +32,9 @@ KEYWORDS = [
     '前端开发',     # 7
     '通信',         # 8
     '电子/半导体',  # 9
-    '高端技术职位', # 10
-    '人工智能',     # 11
-    '信息安全',     # 12
-    '算法'         # 13
+    '人工智能',     # 10
+    '信息安全',     # 11
+    '算法'         # 12
 ]
 
 # 将职位信息保存到csv文件
@@ -71,7 +70,7 @@ def get_page(page_id, keyword):
 
 
 # 进入职位详情页面爬取职位要求描述
-@retry(wait_fixed=8000, stop_max_attempt_number=100) # 当raise异常时，循环调用该函数(最多100次，下一次循环间间隔8秒)
+@retry(wait_fixed=8000, stop_max_attempt_number=10) # 当raise异常时，循环调用该函数(最多100次，每次循环间隔8秒)
 def get_job_detail(link):
     print('-'*20 + '>' + 'get_job_detail()')
     response = requests.get(link, headers=getHeaders())

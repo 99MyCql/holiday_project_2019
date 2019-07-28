@@ -1,47 +1,5 @@
 {%extends "base.html"%}
 
-{% block sidebar_nav %}
-<li class="nav-item">
-  <a class="nav-link active" href="/">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-      viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-      class="feather feather-home">
-      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-      <polyline points="9 22 9 12 15 12 15 22"></polyline>
-    </svg>
-    Home
-  </a>
-</li>
-<li class="nav-item">
-  <a class="nav-link" href="/">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-      viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-      stroke-linecap="round" stroke-linejoin="round"
-      class="feather feather-bar-chart-2">
-      <line x1="18" y1="20" x2="18" y2="10"></line>
-      <line x1="12" y1="20" x2="12" y2="4"></line>
-      <line x1="6" y1="20" x2="6" y2="14"></line>
-    </svg>
-    Reports
-  </a>
-</li>
-<li class="nav-item">
-  <a class="nav-link" href="/predict">
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-    viewBox="0 0 24 24" fill="none" stroke="currentColor"
-    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-    class="feather feather-users">
-    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-    <circle cx="9" cy="7" r="4"></circle>
-    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-  </svg>
-  Predict
-  </a>
-</li>
-{% endblock %}
-
 {% block content %}
 <nav aria-label="breadcrumb" class="mt-2">
   <ol class="breadcrumb px-0" style="background-color: #f0f4f5">
@@ -50,27 +8,30 @@
   </ol>
 </nav>
 
-<div class="row border-bottom pt-3 pb-2 d-flex flex-wrap flex-md-nowrap align-items-center">
-  <h4 class="">{{ station_info.station_name }}各城市分布情况</h4>
+<div class="border-bottom pt-3 pb-2 d-flex flex-wrap flex-md-nowrap align-items-center row">
+  <h4 class="mr-5">{{ station_info.station_name }}各城市分布情况</h4>
+  <div class="btn-group d-flex">
+    <button id="count_btn" class="btn btn-sm btn-outline-secondary active" style="font-size:13px">岗位数量</button>
+    <button id="salary_btn" class="btn btn-sm btn-outline-secondary" style="font-size:13px">平均薪资</button>
+    <button id="house_price_btn" class="btn btn-sm btn-outline-secondary" style="font-size:13px">城市房价水平</button>
+  </div>
 </div>
 <!-- city map header end -->
 
-<div id="city" class="mt-4" style="width:100%;height:600px;"></div>
+<div id="map" class="mt-4 row border" style="height:600px;"></div>
 <!-- city map end -->
 
-<div class="row border-bottom pt-3 pb-2 d-flex flex-wrap flex-md-nowrap align-items-center">
-  <h4 class="">各城市房价水平(地图)</h4>
+<div class="row border-bottom pt-5 pb-2 d-flex flex-wrap flex-md-nowrap align-items-center">
+  <h4 class="mr-5">学历/经验对该岗位的影响</h4>
+  <div class="btn-group d-flex">
+    <button id="degree_btn" class="btn btn-sm btn-outline-secondary active" style="font-size:13px">学历</button>
+    <button id="exp_btn" class="btn btn-sm btn-outline-secondary" style="font-size:13px">经验</button>
+  </div>
 </div>
 
-<div class="row border-bottom pt-3 pb-2 d-flex flex-wrap flex-md-nowrap align-items-center">
-  <h4 class="">学历对该岗位的影响(折线图)</h4>
-</div>
+<div id="line" class="mt-4 row border" style="height:600px;"></div>
 
-<div class="row border-bottom pt-3 pb-2 d-flex flex-wrap flex-md-nowrap align-items-center">
-  <h4 class="">经验对该岗位的影响(折线图)</h4>
-</div>
-
-<div class="row border-bottom pt-3 pb-2 d-flex flex-wrap flex-md-nowrap align-items-center">
+<div class="row border-bottom pt-5 pb-2 d-flex flex-wrap flex-md-nowrap align-items-center">
   <h4 class="">该岗位需要的能力和技术</h4>
 </div>
 {% endblock %}
@@ -85,5 +46,153 @@
 <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=k28IL6xxiNxtiR4RzXrOPwgOuNIA0QSL"></script>
 <!-- 引入百度地图扩展 -->
 <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/extension/bmap.min.js"></script>
+<script>
+var count_data, salary_data, house_price_data;
+// 请求该岗位对应各城市的情况
+$.ajax({
+  type: 'GET',
+  url: '/api/get_city_info/{{ station_info.station_name }}',
+  async: false, // 同步请求
+  success: function(data){
+    console.log(data);
+    count_data = data.count_list;
+    salary_data = data.salary_list;
+    house_price_data = data.house_price_list;
+  },
+  error: function(data){
+  }
+});
+
+var salary_degree, salary_exp;
+$.ajax({
+  type: 'GET',
+  url: '/api/get_salary_info/{{ station_info.station_name }}',
+  async: false, // 同步请求
+  success: function(data){
+    console.log(data);
+    salary_degree = data.salary_degree;
+    salary_exp = data.salary_exp;
+  },
+  error: function(data){
+  }
+});
+</script>
 <script src="{{ url_for('static', filename='js/station_map.js') }}"></script>
+<script src="{{ url_for('static', filename='js/station_line.js') }}"></script>
+<script>
+$("#salary_btn").click(function(){
+  mapChart.setOption({
+    series: [{
+      // 根据名字对应到相应的系列
+      name: '平均薪资',
+      data: convertData(salary_data),
+      symbolSize: function (val) {
+        return val[2] / 800;
+      },
+    },{
+      data: convertData(salary_data.sort(function (a, b) {
+        return b.value - a.value;
+      }).slice(0, 11)),
+      symbolSize: function (val) {
+        return val[2] / 800;
+      },
+    }]
+  });
+  $("#salary_btn").addClass('active');
+  $("#count_btn").removeClass('active');
+  $("#house_price_btn").removeClass('active');
+});
+
+$("#count_btn").click(function(){
+  mapChart.setOption({
+    series: [{
+      // 根据名字对应到相应的系列
+      name: '岗位数量',
+      data: convertData(count_data),
+      symbolSize: function (val) {
+        return val[2] / 5;
+      },
+    },{
+      data: convertData(count_data.sort(function (a, b) {
+        return b.value - a.value;
+      }).slice(0, 11)),
+      symbolSize: function (val) {
+        return val[2] / 5;
+      },
+    }]
+  });
+  $("#salary_btn").removeClass('active');
+  $("#count_btn").addClass('active');
+  $("#house_price_btn").removeClass('active');
+});
+
+$("#house_price_btn").click(function(){
+  mapChart.setOption({
+    series: [{
+      // 根据名字对应到相应的系列
+      name: '城市房价水平',
+      data: convertData(house_price_data),
+      symbolSize: function (val) {
+        return val[2] / 1000;
+      },
+    },{
+      data: convertData(house_price_data.sort(function (a, b) {
+        return b.value - a.value;
+      }).slice(0, 11)),
+      symbolSize: function (val) {
+        return val[2] / 1000;
+      },
+    }]
+  });
+  $("#salary_btn").removeClass('active');
+  $("#count_btn").removeClass('active');
+  $("#house_price_btn").addClass('active');
+});
+
+$("#degree_btn").click(function(){
+  lineChart.setOption({
+    xAxis: [
+      {
+        data: salary_degree.degree,
+      }
+    ],
+    series: [
+      {
+        data:salary_degree.max
+      },
+      {
+        data:salary_degree.mean
+      },
+      {
+        data:salary_degree.min
+      }
+    ]
+  });
+  $("#exp_btn").removeClass('active');
+  $("#degree_btn").addClass('active');
+});
+
+$("#exp_btn").click(function(){
+  lineChart.setOption({
+    xAxis: [
+      {
+        data: salary_exp.work_exp,
+      }
+    ],
+    series: [
+      {
+        data:salary_exp.max
+      },
+      {
+        data:salary_exp.mean
+      },
+      {
+        data:salary_exp.min
+      }
+    ]
+  });
+  $("#exp_btn").addClass('active');
+  $("#degree_btn").removeClass('active');
+});
+</script>
 {% endblock %}
