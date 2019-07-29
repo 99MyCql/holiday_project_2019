@@ -21,7 +21,7 @@
 <div id="map" class="mt-4 row border" style="height:600px;"></div>
 <!-- city map end -->
 
-<div class="row border-bottom pt-5 pb-2 d-flex flex-wrap flex-md-nowrap align-items-center">
+<div class="border-bottom pt-5 pb-2 d-flex flex-wrap flex-md-nowrap align-items-center">
   <h4 class="mr-5">学历/经验对该岗位的影响</h4>
   <div class="btn-group d-flex">
     <button id="degree_btn" class="btn btn-sm btn-outline-secondary active" style="font-size:13px">学历</button>
@@ -31,9 +31,11 @@
 
 <div id="line" class="mt-4 row border" style="height:600px;"></div>
 
-<div class="row border-bottom pt-5 pb-2 d-flex flex-wrap flex-md-nowrap align-items-center">
+<div class="border-bottom pt-5 pb-2 d-flex flex-wrap flex-md-nowrap align-items-center">
   <h4 class="">该岗位需要的能力和技术</h4>
 </div>
+
+<div id="pie" class="mt-4 row border" style="height:600px;"></div>
 {% endblock %}
 
 {% block styles %}
@@ -51,7 +53,7 @@ var count_data, salary_data, house_price_data;
 // 请求该岗位对应各城市的情况
 $.ajax({
   type: 'GET',
-  url: '/api/get_city_info/{{ station_info.station_name }}',
+  url: '/api/get_city_info?key={{ station_info.station_name }}',
   async: false, // 同步请求
   success: function(data){
     console.log(data);
@@ -66,7 +68,7 @@ $.ajax({
 var salary_degree, salary_exp;
 $.ajax({
   type: 'GET',
-  url: '/api/get_salary_info/{{ station_info.station_name }}',
+  url: '/api/get_salary_info?key={{ station_info.station_name }}',
   async: false, // 同步请求
   success: function(data){
     console.log(data);
@@ -76,9 +78,23 @@ $.ajax({
   error: function(data){
   }
 });
+
+var skill_data;
+$.ajax({
+  type: 'GET',
+  url: '/api/get_skill_info?key={{ station_info.station_name }}',
+  async: false, // 同步请求
+  success: function(data){
+    console.log(data);
+    skill_data = data;
+  },
+  error: function(data){
+  }
+});
 </script>
 <script src="{{ url_for('static', filename='js/station_map.js') }}"></script>
 <script src="{{ url_for('static', filename='js/station_line.js') }}"></script>
+<script src="{{ url_for('static', filename='js/skill_pie.js') }}"></script>
 <script>
 $("#salary_btn").click(function(){
   mapChart.setOption({

@@ -4,17 +4,20 @@
 import pandas as pd
 import numpy as np
 
+FILE_ALL = 'data/jobs.csv'
 FILE_51JOB = 'data/jobs_51job.csv'
+FILE_LAGOU = 'data/jobs_lagou.csv'
+FILE_BOSS = 'data/jobs_boss.csv'
 FILE_HOUSE_PRICE = 'data/house_price.csv'
+
+STATION_SKIL_FOLDER = 'data/station_skill/'
 
 class DataAnalysis:
     def __init__(self):
         self.df_house_price = pd.read_csv(FILE_HOUSE_PRICE, encoding='utf-8') # 各城市房价信息
         self.df_house_price.info()
 
-        self.df_51job = pd.read_csv(FILE_51JOB, encoding='utf-8') # 51job网站信息
-
-        self.df = self.df_51job
+        self.df = pd.read_csv(FILE_ALL, encoding='utf-8')
         self.df.info()
         print(self.df.columns)
 
@@ -32,6 +35,11 @@ class DataAnalysis:
             })
         return ret_list
 
+    # 获取对应城市房价
+    def get_house_price(self, city):
+        temp = self.df_house_price[self.df_house_price['city'] == city]
+        return temp['house_price'].values[0]
+
     # 获取关键字位 key 的岗位的信息
     def get_station_info(self, key):
         new_df = self.df[self.df['职位名称关键字'] == key] # 提取对应关键字岗位的数据
@@ -48,6 +56,25 @@ class DataAnalysis:
             'max_count': count_city_list[max_index] # 数量最多城市的岗位数量
         }
 
+    # 获取对应岗位需具备的技能和占比
+    def get_station_skill(self, key):
+        if key == '运维/技术支持':
+            key = '运维'
+        if key == '电子/半导体':
+            key = '电子'
+        with open(STATION_SKIL_FOLDER + key + '.txt', 'r', encoding='utf-8') as f:
+            data = f.read().split()[2:]
+            print(data)
+            kill_dict = {}
+            ret = []
+            for i in data:
+                temp = i.split(',')
+                ret.append({
+                    'name': temp[0],
+                    'value': float(temp[1])
+                })
+            return ret
+
     # 获取岗位在每个城市的信息
     def get_station_info_citys(self, key):
         new_df = self.df[self.df['职位名称关键字'] == key] # 提取对应关键字岗位的数据
@@ -60,14 +87,51 @@ class DataAnalysis:
             'salary_city_list': salary_city_list
         }
 
+    # 返回拉勾网站数据的各岗位信息
+    def get_lagou_stations_info(self):
+        df_lagou = pd.read_csv(FILE_LAGOU, encoding='utf-8') # 拉钩网站信息
+        list_lagou_stations_info = []
+        for key in self.keys:
+            df_temp = df_lagou[df_lagou['职位名称关键字'] == key]
+            # 为NaN
+            mean = df_temp['职位薪资'].mean()
+            if mean != mean:
+                mean = 0
+            list_lagou_stations_info.append({
+                'count': df_temp['职位名称'].count(), # 岗位数量
+                'mean_salary': int(mean) # 岗位平均薪资
+            })
+        return list_lagou_stations_info
+
+    # 返回boss网站数据的各岗位信息
+    def get_boss_stations_info(self):
+        df_boss = pd.read_csv(FILE_BOSS, encoding='utf-8') # 拉钩网站信息
+        list_boss_stations_info = []
+        for key in self.keys:
+            df_temp = df_boss[df_boss['职位名称关键字'] == key]
+            # 为NaN
+            mean = df_temp['职位薪资'].mean()
+            if mean != mean:
+                mean = 0
+            list_boss_stations_info.append({
+                'count': df_temp['职位名称'].count(), # 岗位数量
+                'mean_salary': int(mean) # 岗位平均薪资
+            })
+        return list_boss_stations_info
+
     # 返回51job网站数据的各岗位信息
     def get_51job_stations_info(self):
+        df_51job = pd.read_csv(FILE_51JOB, encoding='utf-8') # 51job网站信息
         list_51job_stations_info = []
         for key in self.keys:
-            df_temp = self.df_51job[self.df_51job['职位名称关键字'] == key]
+            df_temp = df_51job[df_51job['职位名称关键字'] == key]
+            # 为NaN
+            mean = df_temp['职位薪资'].mean()
+            if mean != mean:
+                mean = 0
             list_51job_stations_info.append({
                 'count': df_temp['职位名称'].count(), # 岗位数量
-                'mean_salary': int(df_temp['职位薪资'].mean()) # 岗位平均薪资
+                'mean_salary': int(mean) # 岗位平均薪资
             })
         return list_51job_stations_info
 
@@ -112,5 +176,16 @@ if __name__ == '__main__':
     # print(data_analysis.get_station_info('人工智能'))
     # print(data_analysis.get_station_info_citys('算法'))
     # print(data_analysis.get_house_price_citys())
-    print(data_analysis.get_salary_degree('信息安全'))
-    print(data_analysis.get_salary_exp('信息安全'))
+    # print(data_analysis.get_salary_degree('信息安全'))
+    # print(data_analysis.get_salary_exp('信息安全'))
+
+    # 去重
+    # df = pd.read_csv(FILE_ALL, encoding='utf-8')
+    # print(df.columns)
+    # df.info()
+    # df.drop_duplicates()
+    # df.info()
+    # df.to_csv(FILE_ALL, encoding='utf-8', index=False)
+
+    print(data_analysis.get_house_price('北京'))
+    print(data_analysis.get_station_skill('后端开发'))

@@ -9,11 +9,11 @@
 <!-- breadcrumb -->
 
 <div class="border-bottom pt-3 pb-2 d-flex flex-wrap flex-md-nowrap align-items-center">
-  <h4 class="col-3">各大网站互联网岗位对比</h4>
-  <div class="btn-group d-flex">
+  <h4 class="mr-5">各大网站互联网岗位平均薪资对比</h4>
+  <!-- <div class="btn-group d-flex">
     <button class="btn btn-sm btn-outline-secondary" style="font-size:13px">平均薪资</button>
     <button class="btn btn-sm btn-outline-secondary" style="font-size:13px">岗位数量</button>
-  </div>
+  </div> -->
 </div>
 <!-- comp bar chart header -->
 
@@ -21,7 +21,7 @@
 <!-- comp bar chart -->
 
 <div class="pt-5 pb-2 row d-flex flex-wrap flex-md-nowrap align-items-center">
-  <h4 class="col-2">各互联网岗位情况</h4>
+  <h4 class="">各互联网岗位情况</h4>
 </div>
 <!-- 岗位 tabel header end -->
 
@@ -44,7 +44,7 @@
       <td>{{ station.mean_salary }}</td>
       <td>{{ station.count }}</td>
       <td>{{ station.max_count_city }}  {{ station.max_count }}/{{ station.count }}</td>
-      <td><a class="btn btn-primary btn-sm" href="/station_detail_page/{{ station.station_name }}"> 详情 </a></td>
+      <td><a class="btn btn-primary btn-sm" href="/station_detail_page?key={{ station.station_name }}"> 详情 </a></td>
     </tr>
     {% endfor %}
   </tbody>
@@ -59,7 +59,7 @@
 
 {% block scripts %}
 <script>
-var x_data, y1_data, y2_data;
+var x_data, y1_data, y2_data, y3_data;
 $.ajax({
   type: 'GET',
   url: '/api/get_website_comp',
@@ -69,6 +69,7 @@ $.ajax({
     x_data = data.keys;
     y1_data = data.list_51job_salary;
     y2_data = data.list_boss_salary;
+    y3_data = data.list_lagou_salary;
   },
   error: function(data){
   }

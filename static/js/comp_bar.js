@@ -16,7 +16,7 @@ option = {
     }
   },
   legend: {
-    data: ['51job','boss直聘']
+    data: ['51job','boss直聘','拉勾网']
   },
   toolbox: {
     show : true,
@@ -55,6 +55,11 @@ option = {
       name: 'boss直聘',
       type: 'bar',
       data: y2_data
+    },
+    {
+      name: '拉勾网',
+      type: 'bar',
+      data: y3_data
     }
   ]
 };

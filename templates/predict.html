@@ -1,39 +1,62 @@
 {%extends "base.html"%}
 
 {% block content %}
-<div class="container pt-5" style="height: calc(100vh - 60px);">
-  <h3 class="mb-4">预测您的薪资</h3>
-  <form class="py-3">
+<div class="container py-5">
+  <h3 class="pb-3 border-bottom">预测您的薪资</h3>
+  <form class="pb-3" action="/predict" method="POST">
     <div class="form-group">
       <label>心仪岗位</label>
-      <select class="form-control">
+      <select class="form-control" name="station">
+        <option value="">请选择岗位</option>
         {% for key in keys %}
-        <option value="{{ key }}">{{ key }}</option>
+        <option value="{{ key }}" {%if data%}{% if data.station == key %} selected {%endif%}{%endif%}>{{ key }}</option>
         {% endfor %}
       </select>
     </div>
     <div class="form-group">
       <label>学历</label>
-      <select class="form-control">
-        <option value="高中">高中</option>
-        <option value="大专">大专</option>
-        <option value="本科">本科</option>
-        <option value="硕士">硕士</option>
-        <option value="博士">博士</option>
+      <select class="form-control" name="degree">
+        <option value="">请选择学历</option>
+        <option value="高中" {%if data%}{% if data.degree == '高中' %} selected {%endif%}{%endif%}>高中</option>
+        <option value="大专" {%if data%}{% if data.degree == '大专' %} selected {%endif%}{%endif%}>大专</option>
+        <option value="本科" {%if data%}{% if data.degree == '本科' %} selected {%endif%}{%endif%}>本科</option>
+        <option value="硕士" {%if data%}{% if data.degree == '硕士' %} selected {%endif%}{%endif%}>硕士</option>
+        <option value="博士" {%if data%}{% if data.degree == '博士' %} selected {%endif%}{%endif%}>博士</option>
       </select>
     </div>
     <div class="form-group">
-      <label>工作经验</label>
-      <input class="form-control" id="work_exp" placeholder="Enter work experience">
-      <small class="form-text text-muted">请输入阿拉伯数字：0, 1, 2....</small>
+      <label>请输入城市</label>
+      <input class="form-control" placeholder="Enter city name" name="city" {% if data %} value="{{data.work_exp}}" {%endif%}>
+      <small class="form-text text-muted">请输入可靠城市，不要进行无意义的尝试哦</small>
+      <!-- <select class="form-control" name="city">
+        <option value="">请选择城市</option>
+        <option value="高中" {%if data%}{% if data.degree == '高中' %} selected {%endif%}{%endif%}>高中</option>
+        <option value="大专" {%if data%}{% if data.degree == '大专' %} selected {%endif%}{%endif%}>大专</option>
+        <option value="本科" {%if data%}{% if data.degree == '本科' %} selected {%endif%}{%endif%}>本科</option>
+        <option value="硕士" {%if data%}{% if data.degree == '硕士' %} selected {%endif%}{%endif%}>硕士</option>
+        <option value="博士" {%if data%}{% if data.degree == '博士' %} selected {%endif%}{%endif%}>博士</option>
+      </select> -->
     </div>
     <div class="form-group">
-      <label>已具备的软硬件技能</label>
-      <textarea class="form-control" rows="3"></textarea>
-      <small class="form-text text-muted">请列举，如：java, sql, python....</small>
+      <label>工作经验</label>
+      <input class="form-control" id="work_exp" placeholder="Enter work experience" name="work_exp" {% if data %} value="{{data.work_exp}}" {%endif%}>
+      <small class="form-text text-muted">请输入阿拉伯数字：0, 1, 2....</small>
     </div>
-    <button type="submit" class="btn btn-primary">预测</button>
+    <div class="d-flex">
+      <button type="submit" class="btn btn-primary ml-auto mr-5">智能预测</button>
+    </div>
   </form>
+
+  {% if prediction %}
+  <div class="card mt-4">
+    <div class="card-header">
+      预测结果
+    </div>
+    <div class="card-body">
+      {{ prediction }}
+    </div>
+  </div>
+  {% endif %}
 </div>
 {% endblock %}
 
