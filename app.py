@@ -1,7 +1,7 @@
 from flask import Flask, render_template, url_for, jsonify, request
 from datetime import timedelta
 from dataManager import data_analysis
-from modelManager import salary_pred, station_recommend
+import modelManager
 
 
 HOST = 'localhost'
@@ -31,23 +31,43 @@ def station_detail_page():
 # 预测界面
 @app.route('/predict_page')
 def predict_page():
-    return render_template('predict.html', keys = data_analysis.keys, active_link = ['', '', 'active', ''])
+    return render_template('predict.html',
+            keys = data_analysis.keys,
+            active_link = ['', '', 'active', ''])
 
 # 预测
 @app.route('/predict', methods=['POST'])
 def predict():
+    city = request.form.get('city')
+    if city == '':
+        return render_template('predict.html',
+            data = request.form,
+            keys = data_analysis.keys,
+            msg = '没选择城市哦',
+            active_link = ['', '', 'active', ''])
+
     station = request.form.get('station')
+    if station == '':
+        return render_template('predict.html',
+            data = request.form,
+            keys = data_analysis.keys,
+            msg = '没选择岗位哦',
+            active_link = ['', '', 'active', ''])
+
     degree = request.form.get('degree')
     if request.form.get('work_exp') == '':
         work_exp = 0
     else:
         work_exp = int(request.form.get('work_exp'))
-    prediction = salary_pred(station, work_exp, degree)
+
+    prediction = modelManager.salary_pred(station, work_exp, degree, city)
     print(prediction)
+    house_price = data_analysis.get_house_price(city)
     return render_template('predict.html',
             data = request.form,
             keys = data_analysis.keys,
-            prediction = prediction[0],
+            prediction = round(prediction),
+            house_price = house_price,
             active_link = ['', '', 'active', ''])
 
 # 推荐界面
@@ -62,7 +82,7 @@ def recommend():
     work_exp = request.form.get('work_exp')
     desc = request.form.get('desc')
     msg = degree + ',' + str(work_exp) + '年经验,' + desc
-    res_list = station_recommend(msg)
+    res_list = modelManager.station_recommend(msg)
     return render_template('recommend.html',
             data = request.form,
             res_list = res_list,
@@ -138,6 +158,13 @@ def get_skill_info():
         'legendData': legendData,
         'seriesData': seriesData
     })
+
+# 获取对应岗位所需技能和占比
+@app.route('/api/get_station_citys')
+def get_station_citys():
+    key = request.args.get('key')
+    citys = modelManager.get_citys(key)
+    return jsonify(citys)
 
 
 if __name__ == '__main__':
