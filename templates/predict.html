@@ -92,7 +92,7 @@ function get_citys(key) {
       console.log(data);
       city_select = $('#city_select');
       city_select.empty();
-      city_select.append("<option value=''>请选择岗位</option>");
+      city_select.append("<option value=''>请选择城市</option>");
       for (let index = 0; index < data.length; index++) {
         console.log(data[index]);
         city_select.append("<option value='" + data[index] + "'>" + data[index] + "</option>");

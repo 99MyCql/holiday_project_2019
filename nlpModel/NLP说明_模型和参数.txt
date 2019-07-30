@@ -1,0 +1,107 @@
+一、job_loader.py：功能函数定义
+
+1、读取文件，获取：特征值【岗位描述】，目标值【岗位类别】。
+
+2、构建词汇表：build_vocab()：
+
+import Counter 类，调用 Counter.most_common()，取出文本中词频最高的词构建词汇表。
+
+3、用 id 表示“字词”“岗位分类”，实现 文字 id 相互转换：
+
+对于词汇表的词：word_to_id = dict(zip(words, range(len(words))))，zip 将元素打包成元组，range() 按顺序对词依次编号。
+
+4、分批次处理数据：batch_iter()
+
+===============================================================
+
+二、cnn_model.py：
+
+1、TCNNConfig：配置 CNN 参数。
+
+seq_length = 600：岗位描述的文本长度
+num_classes = 13：岗位的类别数，一共是 13 个
+其他配置包括“卷积核”、“神经元”、“词汇表”、“学习率”、“批次”的相关数据
+
+2、TextCNN：构建 CNN 模型：
+
+0) # 三个待输入的数据
+        self.input_x = tf.placeholder(tf.int32, [None, self.config.seq_length], name='input_x')
+        self.input_y = tf.placeholder(tf.float32, [None, self.config.num_classes], name='input_y')
+        self.keep_prob = tf.placeholder(tf.float32, name='keep_prob')
+
+描述：input_x：岗位描述，input_y：岗位类别，keep_prob：神经元保留比例
+
+1) 词向量映射：
+
+前面配置：
+vocab_size = 100  # 词汇表大小
+embedding_dim = 64  # 词向量维度
+
+功能代码：
+(a) embedding = tf.get_variable('embedding', [self.config.vocab_size, self.config.embedding_dim])
+(b) embedding_inputs = tf.nn.embedding_lookup(embedding, self.input_x)
+# tf.nn.embedding_lookup 选取一个张量里面索引对应的元素。
+
+描述：(a) 将词汇表中 100 个词映射到 64 个维度
+          (b) 取出输入 ( 岗位描述 ) 中包含词汇表中的词，输入被转换为 embedding_inputs
+
+2) 卷积和池化：
+
+前面配置：
+num_filters = 256  # 卷积核数目
+kernel_size = 5  # 卷积核尺寸
+
+功能代码：
+tf.layers.conv1d：一维卷积用于处理文本
+tf.reduce_max：池化取最大值
+
+描述：将 embedding_inputs 进行一维卷积，然后池化，传入卷积核相关数据。
+
+3) 全连接和激活：
+
+前面配置：
+hidden_dim = 128  # 全连接层神经元
+dropout_keep_prob = 0.5  # dropout保留比例
+num_classes = 13  # 岗位类别数
+
+功能代码：
+(a) fc = tf.layers.dense(gmp, self.config.hidden_dim, name='fc1')
+(b) fc = tf.contrib.layers.dropout(fc, self.keep_prob)
+(c) fc = tf.nn.relu(fc)
+# 分类器
+(d) self.logits = tf.layers.dense(fc, self.config.num_classes, name='fc2')
+# 找出每一行中数值最大的列号，一共有13列，对应13种职业类别                
+(e) self.y_pred_cls = tf.argmax(tf.nn.softmax(self.logits), 1)
+
+描述：神经元共分为【输入层】、【全连接层】、【输出层】三层
+          (a) tf.layers.dense() 实现将 128 个神经元与输入层全连接
+          (b) 神经元保留比例为 0.5，减小过拟合
+          (c) 激活函数使用 relu
+          (d) 将 13 中岗位进行分类编号
+          (e) tf.argmax() 找出预测值最大的岗位的编号 ( 列号 )，预测值为 y_pred_cls
+
+4、损失和优化：
+
+前面配置：
+learning_rate = 1e-3  # 学习率
+
+功能代码：
+# 损失函数，交叉熵
+(a) cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits=self.logits, labels=self.input_y)
+(b) self.loss = tf.reduce_mean(cross_entropy)
+# 优化器
+(c) self.optim = tf.train.AdamOptimizer(learning_rate=self.config.learning_rate).minimize(self.loss)
+
+描述：(a) 将 input_y 转换为 logits 分类编号，交叉熵函数，计算损失值
+          (b) 损失函数，取平均值
+          (c) 优化器，学习率参数为 0.001
+
+5、计算准确率
+
+(a) correct_pred = tf.equal(tf.argmax(self.input_y, 1), self.y_pred_cls)
+(b) self.acc = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
+
+描述：(a) input_y 的最大值 ( 最有可能是哪个岗位 )，与预测值 y_pred_cls 比较是否相同，这两个值都是 logits 编号。
+          (b) 预测准确率
+
+===============================================================
