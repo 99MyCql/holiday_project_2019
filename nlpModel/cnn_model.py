@@ -59,7 +59,7 @@ class TextCNN(object):
 
             # 分类器
             self.logits = tf.layers.dense(fc, self.config.num_classes, name='fc2')
-            # 找出每一行中数值最大的列号，一共有10列，对应10种职业类别                
+            # 找出每一行中数值最大的列号，一共有10列，对应10种职业类别
             self.y_pred_cls = tf.argmax(tf.nn.softmax(self.logits), 1)
 
         with tf.name_scope("optimize"):
