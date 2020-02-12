@@ -1,5 +1,8 @@
 .vscode
 nohup.out
+crawler/img
+crawler/*.csv
+crawler/ip.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
